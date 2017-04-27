@@ -1,0 +1,275 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: VPC containing 2 public and 2 private subnets, with CIDR ranges within Northwestern's dedicated range for AWS.
+
+Parameters:
+  CIDRRange:
+    Description: 'NUIT-assigned private subnet for this VPC (must be within 10.28.0.0/16). Must be a /24. E.g. "10.28.100.0/24"'
+    Type: String
+
+  Environment:
+    Type: String
+    Default: 'Production'
+    AllowedValues:
+      - 'Test'
+      - 'Staging'
+      - 'Production'
+
+  Owner:
+    Type: String
+    Description: 'Email address of the team owning this account'
+    Default: 'cloudoperations@northwestern.edu'
+
+  Application:
+    Type: String
+    Default: 'Northwestern Peered VPC'
+
+Resources:
+  VPCBase:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Join [ '', [!Join ['.', [ !Select [0, !Split ['.', !Ref CIDRRange] ], !Select [1, !Split ['.', !Ref CIDRRange] ], !Select [2, !Split ['.', !Ref CIDRRange] ], '0' ] ], '/24' ] ]
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ !Ref 'AWS::StackName', 'VPC' ] ]
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Application
+          Value: !Ref Application
+
+  PubNetAZ1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [0, !GetAZs '' ]
+      CidrBlock: !Join [ '', [!Join ['.', [ !Select [0, !Split ['.', !Ref CIDRRange] ], !Select [1, !Split ['.', !Ref CIDRRange] ], !Select [2, !Split ['.', !Ref CIDRRange] ], '0' ] ], '/27' ] ]
+      MapPublicIpOnLaunch: True
+      VpcId: !Ref VPCBase
+      Tags:
+        - Key: Name
+          Value: !Join ['-', [ !Ref 'AWS::StackName', PubAZ1] ]
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Application
+          Value: !Ref Application
+
+  PubNetAZ2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [1, !GetAZs '' ]
+      CidrBlock: !Join [ '', [!Join ['.', [ !Select [0, !Split ['.', !Ref CIDRRange] ], !Select [1, !Split ['.', !Ref CIDRRange] ], !Select [2, !Split ['.', !Ref CIDRRange] ], '32' ] ], '/27' ] ]
+      MapPublicIpOnLaunch: True
+      VpcId: !Ref VPCBase
+      Tags:
+        - Key: Name
+          Value: !Join ['-', [ !Ref 'AWS::StackName', PubAZ2] ]
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Application
+          Value: !Ref Application
+          
+  PvtNetAZ1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [0, !GetAZs '' ]
+      CidrBlock: !Join [ '', [!Join ['.', [ !Select [0, !Split ['.', !Ref CIDRRange] ], !Select [1, !Split ['.', !Ref CIDRRange] ], !Select [2, !Split ['.', !Ref CIDRRange] ], '64' ] ], '/27' ] ]
+      MapPublicIpOnLaunch: False
+      VpcId: !Ref VPCBase
+      Tags:
+        - Key: Name
+          Value: !Join ['-', [ !Ref 'AWS::StackName', PvtAZ1] ]
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Application
+          Value: !Ref Application
+
+  PvtNetAZ2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [1, !GetAZs '' ]
+      CidrBlock: !Join [ '', [!Join ['.', [ !Select [0, !Split ['.', !Ref CIDRRange] ], !Select [1, !Split ['.', !Ref CIDRRange] ], !Select [2, !Split ['.', !Ref CIDRRange] ], '96' ] ], '/27' ] ]
+      MapPublicIpOnLaunch: False
+      VpcId: !Ref VPCBase
+      Tags:
+        - Key: Name
+          Value: !Join ['-', [ !Ref 'AWS::StackName', PvtAZ2] ]
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Application
+          Value: !Ref Application
+
+  IGWBase:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join ['-', [ !Ref 'AWS::StackName', IGWBase] ]
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Application
+          Value: !Ref Application
+
+  VGAIGWBase:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref IGWBase
+      VpcId: !Ref VPCBase
+
+  RouteTablePublic:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPCBase
+      Tags:
+        - Key: Name
+          Value: !Join ['-', [ !Ref 'AWS::StackName', PubRT] ]
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Application
+          Value: !Ref Application
+
+  RouteTablePrivateAZ1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPCBase
+      Tags:
+        - Key: Name
+          Value: !Join ['-', [ !Ref 'AWS::StackName', PvtAZ1RT] ]
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Application
+          Value: !Ref Application
+
+  RouteTablePrivateAZ2:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPCBase
+      Tags:
+        - Key: Name
+          Value: !Join ['-', [ !Ref 'AWS::StackName', PvtAZ2RT] ]
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Application
+          Value: !Ref Application
+
+  RouteAssociationPubAZ1Default:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTablePublic
+      SubnetId: !Ref PubNetAZ1
+
+  RouteAssociationPubAZ2Default:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTablePublic
+      SubnetId: !Ref PubNetAZ2
+
+  RouteAssociationPrivateAZ1Default:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTablePrivateAZ1
+      SubnetId: !Ref PvtNetAZ1
+
+  RouteAssociationPrivateAZ2Default:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTablePrivateAZ2
+      SubnetId: !Ref PvtNetAZ2
+
+  RoutePublicDefault:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTablePublic
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref IGWBase
+
+  EIPNATAZ1:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  EIPNATAZ2:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  NATAZ1:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt [EIPNATAZ1, AllocationId]
+      SubnetId: !Ref PubNetAZ1
+
+  NATAZ2:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt [EIPNATAZ2, AllocationId]
+      SubnetId: !Ref PubNetAZ2
+
+  NATAZ1Route:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTablePrivateAZ1
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NATAZ1
+
+  NATAZ2Route:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTablePrivateAZ2
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NATAZ2
+
+Outputs:
+  VPCID:
+    Description: The ID of the Stack VPC
+    Value: !Ref VPCBase
+    Export:
+      Name: !Sub "${AWS::StackName}-VPCID"
+  AZ1:
+    Description: The first availability zone used by this VPC
+    Value: !GetAtt [PubNetAZ1, AvailabilityZone]
+    Export:
+      Name: !Sub "${AWS::StackName}-AZ1"
+  AZ2:
+    Description: The second availability zone used by this VPC
+    Value: !GetAtt [PubNetAZ2, AvailabilityZone]
+    Export:
+      Name: !Sub "${AWS::StackName}-AZ2"
+  PubNetAZ1:
+    Description: ID of public subnet in first available AZ
+    Value: !Ref PubNetAZ1
+    Export:
+      Name: !Sub "${AWS::StackName}-PubNetAZ1"
+  PubNetAZ2:
+    Description: ID of public subnet in second available AZ
+    Value: !Ref PubNetAZ2
+    Export:
+      Name: !Sub "${AWS::StackName}-PubNetAZ2"
+  PvtNetAZ1:
+    Description: ID of private subnet in first available AZ
+    Value: !Ref PvtNetAZ1
+    Export:
+      Name: !Sub "${AWS::StackName}-PvtNetAZ1"
+  PvtNetAZ2:
+    Description: ID of private subnet in second available AZ
+    Value: !Ref PvtNetAZ2
+    Export:
+      Name: !Sub "${AWS::StackName}-PvtNetAZ2"
