@@ -15,10 +15,36 @@ peer then you can use any private subnet range.
 
 The `CIDRRange` parameter should look like e.g. `10.28.100.0/24`.
 
-The stack will create a VPC containing two private and two public subnets, each a /26 subnet.
+The stack will create a VPC containing two private and two public subnets, each
+a /26 subnet.
 
 To launch this stack you can use the following command:
 
-    aws cloudformation create-stack --stack-name <STACKNAME> --region us-east-2 --template-body file://vpc.yaml --parameters ParameterKey=CIDRRange,ParameterValue=<CIDRRANGE> --tags Key=Environment,Value=<ENVIRONMENT> Key=Application,Value=PeeredVPC Key=Owner,Value=<OWNER>
+    aws cloudformation create-stack --stack-name my-vpc-stack --region us-east-2 --template-body file://vpc.yaml --parameters ParameterKey=CIDRRange,ParameterValue=<CIDRRANGE> --tags Key=Environment,Value=<ENVIRONMENT> Key=Application,Value=PeeredVPC Key=Owner,Value=<OWNER>
 
-Replacing the `STACKNAME`, `CIDRRANGE`, `ENVIRONMENT`, and `OWNER` place holders with appropriate values.
+Replacing the `CIDRRANGE`, `ENVIRONMENT`, and `OWNER` place holders with
+appropriate values (and using a different stack name if desired).
+
+### Peering setup
+
+Once the peering connection has been initiated and approved, a route needs to be
+added to the VPC's default public route table from this VPC to the peered VPC.
+To do this, a second cloudformation template is included which can be created as
+a stack which creates this route.
+
+You will need the output name of the public routing table from the VPC stack
+(look for the output with the key "RouteTablePublic" from the VPC stack). In the
+example above, the output would be "my-vpc-stack-RouteTablePublic". You will
+also need the peering connection ID (which you can see in the Peering
+Connections section of the VPC console, and the subnet of the peered VPC (this
+defaults to 10.28.119.0/24).
+
+You can launch this stack with this command:
+
+    aws cloudformation create-stack --stack-name peered-vpc-route --region us-east-2 --template-body file://route-table-update.yaml --parameters ParameterKey=RouteTable,ParameterValue=<ROUTE_TABLE_EXPORT> ParameterKey=PeeringConnectionId,ParameterValue=<PEERING_CONNECTION_ID> ParameterKey=PeerSubnet,ParameterValue=<PEERED_SUBNET_CIDR>
+
+Replacing the `ROUTE_TABLE_EXPORT`, `PEERING_CONNECTION_ID`, and
+`PEERED_SUBNET_CIDR` placeholders with appropriate values.
+
+A route from the peered VPC to this VPC will need to be added to the peered
+VPC's route table as well.

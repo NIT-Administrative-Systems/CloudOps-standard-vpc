@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: Route table update for VPC peering connection
+
+Parameters:
+  RouteTable:
+    Description: 'The name of the export from the main VPC stack containing the route table id. E.g. "peered-vpc-RouteTablePublic"'
+    Type: String
+
+  PeeringConnectionId:
+    Description: 'The id of the peering connection from the main VPC stack to the shared services VPC'
+    Type: String
+
+  PeerSubnet:
+    Description: 'The subnet of the peered VPC'
+    Default: '10.28.129.0/24'
+    Type: String
+
+Resources:
+  SharedServicesVpcRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: !Ref PeerSubnet
+      VpcPeeringConnectionId: !Ref PeeringConnectionId
+      RouteTableId:
+        Fn::ImportValue:
+          !Ref RouteTable
