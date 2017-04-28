@@ -243,6 +243,11 @@ Outputs:
     Value: !Ref VPCBase
     Export:
       Name: !Sub "${AWS::StackName}-VPCID"
+  RouteTablePublic:
+    Description: The default public route table of the VPC
+    Value: !Ref RouteTablePublic
+    Export:
+      Name: !Sub "${AWS::StackName}-RouteTablePublic"
   AZ1:
     Description: The first availability zone used by this VPC
     Value: !GetAtt [PubNetAZ1, AvailabilityZone]
