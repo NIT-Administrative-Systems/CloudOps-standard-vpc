@@ -37,7 +37,7 @@ You will need the output name of the public routing table from the VPC stack
 example above, the output would be "my-vpc-stack-RouteTablePublic". You will
 also need the peering connection ID (which you can see in the Peering
 Connections section of the VPC console, and the subnet of the peered VPC (this
-defaults to 10.28.119.0/24).
+defaults to 10.28.129.0/24).
 
 You can launch this stack with this command:
 
