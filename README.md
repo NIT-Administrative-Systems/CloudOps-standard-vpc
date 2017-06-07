@@ -16,7 +16,7 @@ peer then you can use any private subnet range.
 The `CIDRRange` parameter should look like e.g. `10.28.100.0/24`.
 
 The stack will create a VPC containing two private and two public subnets, each
-a /26 subnet.
+a /27 subnet.
 
 To launch this stack you can use the following command:
 
