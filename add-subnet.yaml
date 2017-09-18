@@ -1,0 +1,17 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  PvtNetAZ1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: vpc-19f53370
+      CidrBlock: 10.28.129.128/28
+      AvailabilityZone: "us-east-2a"
+      Tags:
+      - Key: Name
+        Value: nit-jenkins-PvtAZ1
+      - Key: Application
+        Value: CloudBees Jenkins
+      - Key: Environment
+        Value: Production
+      - Key: Owner
+        Value: cloudoperations@northwestern.edu
