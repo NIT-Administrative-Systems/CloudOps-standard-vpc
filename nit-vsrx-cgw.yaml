@@ -1,0 +1,17 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: Create a Customer Gateway to connect to an Evanston DC vSRX.
+
+Resources: 
+  EVDCvSRXfw1146: 
+    Type: "AWS::EC2::CustomerGateway"
+    Properties: 
+      Type: ipsec.1
+      BgpAsn: 64514  # Provided by CI-TNS - unique to each connection
+      IpAddress: 165.124.26.43  # Provided by CI-TNS
+      Tags:
+        - Key: Name
+          Value: evdc-vsrx-fw-1146-1-ci.northwestern.edu
+        - Key: Owner
+          Value: NIT-CI-TNS-DataNetwork
+          
