@@ -41,7 +41,6 @@ Resources:
   nuVGW:
     Type: "AWS::EC2::VPNGateway"
     Properties: 
-      AmazonSideAsn: Long
       Type: ipsec.1
       Tags:
           Key: Name
