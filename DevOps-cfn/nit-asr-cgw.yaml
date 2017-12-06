@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: Create two Customer Gateways to connect to the Evanston and Chicago Campus Cisco ASR devices.
+
+Resources: 
+  levASR: 
+    Type: "AWS::EC2::CustomerGateway"
+    Properties: 
+      Type: ipsec.1
+      BgpAsn: 64513 # Provided by CI-TNS - used for the ASR
+      IpAddress: 129.105.247.234  # Provided by CI-TNS
+      Tags:
+        - Key: Name
+          Value: lev-vpn-rtr-3.northwestern.edu
+        - Key: Owner
+          Value: NIT-CI-TNS-DataNetwork
+ 
+  abbtASR: 
+    Type: "AWS::EC2::CustomerGateway"
+    Properties: 
+      Type: ipsec.1
+      BgpAsn: 64512  # Provided by CI-TNS - used for the ASR
+      IpAddress: 129.105.247.48  # Provided by CI-TNS
+      Tags:
+        - Key: Name
+          Value: abbt-vpn-rtr-3.northwestern.edu
+        - Key: Owner
+          Value: NIT-CI-TNS-DataNetwork
