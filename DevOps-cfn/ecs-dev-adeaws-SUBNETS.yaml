@@ -94,6 +94,6 @@ Resources:
         RouteTableIds: 
         - !Ref AppAZ1RT
         - !Ref AppAZ2RT
-        VpnGatewayId: vgw-11c14d21
+        VpnGatewayId: vgw-35b43b05
     DependsOn:
       - AppAZ1
