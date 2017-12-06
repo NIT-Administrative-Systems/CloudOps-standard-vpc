@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: Creates two Customer Gateways to connect to the Evanston and Chicago Campus Cisco ASR devices, a Virtual Gateway and VPN COnnections.
+# Create the Stack name to be <AWS ALias>-VPN, eg: nit-et-ia-VPN
+
+Parameters:
+  Owner:
+    Type: String
+    Description: 'Email address of the team owning this account'
+    Default: 'awscloudops@northwestern.edu'
+  
+  VPCname:
+    Type: String
+    Description: 'Name of the VPC/AWS Friendly name (example: nit-et-ia)'
+    Default: 'enter-name-here'
+
+Resources: 
+  abbtASR: 
+    Type: "AWS::EC2::CustomerGateway"
+    Properties: 
+      Type: ipsec.1
+      BgpAsn: 64512  # Provided by CI-TNS - used for the ASR
+      IpAddress: 129.105.247.48  # Provided by CI-TNS
+      Tags:
+        - Key: Name
+          Value: abbt-vpn-rtr-3.northwestern.edu
+        - Key: Owner
+          Value: NIT-CI-TNS-DataNetwork
+  levASR: 
+    Type: "AWS::EC2::CustomerGateway"
+    Properties: 
+      Type: ipsec.1
+      BgpAsn: 64513 # Provided by CI-TNS - used for the ASR
+      IpAddress: 129.105.247.234  # Provided by CI-TNS
+      Tags:
+        - Key: Name
+          Value: lev-vpn-rtr-3.northwestern.edu
+        - Key: Owner
+          Value: NIT-CI-TNS-DataNetwork
+
+  nuVGW:
+    Type: "AWS::EC2::VPNGateway"
+    Properties: 
+      AmazonSideAsn: Long
+      Type: ipsec.1
+      Tags:
+          Key: Name
+          Value: !Join ['-', [ !Ref 'VPCname', VGW] ]
+          Key: Owner
+          Value: !Ref Owner
+
+  abbtVPNConnection: 
+    Type: "AWS::EC2::VPNConnection"
+    Properties: 
+      Type: ipsec.1
+      StaticRoutesOnly: False
+      CustomerGatewayId: !Ref abbtASR
+      VpnGatewayId: !Ref nuVGW
+      Tags:
+          Key: Name
+          Value: nit-abbt-asr-VPN
+          Key: Owner
+          Value: NIT-CI-TNS-DataNetwork
+  levVPNConnection: 
+    Type: "AWS::EC2::VPNConnection"
+    Properties: 
+      Type: ipsec.1
+      StaticRoutesOnly: False
+      CustomerGatewayId: !Ref levASR
+      VpnGatewayId: !Ref nuVGW
+      Tags:
+          Key: Name
+          Value: nit-lev-asr-VPN
+          Key: Owner
+          Value: NIT-CI-TNS-DataNetwork

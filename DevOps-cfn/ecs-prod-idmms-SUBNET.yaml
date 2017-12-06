@@ -1,8 +1,8 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description: Create two PROD Public Subnets with default route to IGW, and Dynamic routing over VPN to campus.
-# base kept for example...not used
+Description: Two Private PROD Subnets with default route to NGW, and Dynamic routing over VPN to campus.
+
 Resources:
   AppAZ1:
     Type: AWS::EC2::Subnet
@@ -10,10 +10,10 @@ Resources:
       VpcId: vpc-1799d67e
       CidrBlock: 10.28.135.128/28
       AvailabilityZone: "us-east-2a"
-      MapPublicIpOnLaunch: True
+      MapPublicIpOnLaunch: False
       Tags:
       - Key: Name
-        Value: ecs-prod-idmms-PubAZ1
+        Value: ecs-prod-idmms-PvtAZ1
       - Key: Application
         Value: ECS IDMMS PROD 
       - Key: Environment
@@ -26,7 +26,7 @@ Resources:
       VpcId: vpc-1799d67e
       Tags:
       - Key: Name
-        Value: ecs-prod-idmms-PubAZ1-RT
+        Value: ecs-prod-idmms-PvtAZ1-RT
       - Key: Application
         Value: ECS IDMMS PROD
       - Key: Environment
@@ -41,10 +41,10 @@ Resources:
       VpcId: vpc-1799d67e
       CidrBlock: 10.28.135.144/28
       AvailabilityZone: "us-east-2b"
-      MapPublicIpOnLaunch: True
+      MapPublicIpOnLaunch: False
       Tags:
       - Key: Name
-        Value: ecs-prod-idmms-PubAZ2
+        Value: ecs-prod-idmms-PvtAZ2
       - Key: Application
         Value: ECS IDMMS PROD
       - Key: Environment
@@ -57,7 +57,7 @@ Resources:
       VpcId: vpc-1799d67e
       Tags:
       - Key: Name
-        Value: ecs-prod-idmms-PubAZ2-RT
+        Value: ecs-prod-idmms-PvtAZ2-RT
       - Key: Application
         Value: ECS IDMMS PROD
       - Key: Environment
@@ -75,7 +75,7 @@ Resources:
     Type: "AWS::EC2::Route"
     Properties:  
         DestinationCidrBlock: 0.0.0.0/0
-        GatewayId: igw-bc9801d5
+        NatGatewayId: nat-0ff2fc86754d0882a
         RouteTableId: !Ref AppAZ1RT
   AppAZ2RTAssoc:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
@@ -86,7 +86,7 @@ Resources:
     Type: 'AWS::EC2::Route'
     Properties:  
         DestinationCidrBlock: 0.0.0.0/0
-        GatewayId: igw-bc9801d5
+        NatGatewayId: nat-0ff2fc86754d0882a
         RouteTableId: !Ref AppAZ2RT
   VGWprop:
     Type: 'AWS::EC2::VPNGatewayRoutePropagation'
