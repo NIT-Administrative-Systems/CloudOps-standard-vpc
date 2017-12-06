@@ -1,0 +1,99 @@
+
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description:  Two Private DEV Subnets with default route to NGW, and Dynamic routing over VPN to campus.
+
+Resources:
+  AppAZ1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: vpc-db09ffb3
+      CidrBlock: 10.28.132.160/28
+      AvailabilityZone: "us-east-2a"
+      MapPublicIpOnLaunch: False
+      Tags:
+      - Key: Name
+        Value: ecs-dev-idmms-PvtAZ1
+      - Key: Application
+        Value: ECS ADEA WS 
+      - Key: Environment
+        Value: Development
+      - Key: Owner
+        Value: awscloudops@northwestern.edu
+  AppAZ1RT:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: vpc-db09ffb3
+      Tags:
+      - Key: Name
+        Value: ecs-dev-idmms-PvtAZ1-RT
+      - Key: Application
+        Value: ECS ADEA WS
+      - Key: Environment
+        Value: Development
+      - Key: Owner
+        Value: awscloudops@northwestern.edu
+    DependsOn:
+      - AppAZ1
+  AppAZ2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: vpc-db09ffb3
+      CidrBlock: 10.28.132.176/28
+      AvailabilityZone: "us-east-2b"
+      MapPublicIpOnLaunch: False
+      Tags:
+      - Key: Name
+        Value: ecs-dev-idmms-PvtAZ2
+      - Key: Application
+        Value: ECS ADEA WS
+      - Key: Environment
+        Value: Development
+      - Key: Owner
+        Value: awscloudops@northwestern.edu
+  AppAZ2RT:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: vpc-db09ffb3
+      Tags:
+      - Key: Name
+        Value: ecs-dev-idmms-PvtAZ2-RT
+      - Key: Application
+        Value: ECS ADEA WS
+      - Key: Environment
+        Value: Development
+      - Key: Owner
+        Value: awscloudops@northwestern.edu
+    DependsOn:
+      - AppAZ2
+  AppAZ1RTAssoc:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref AppAZ1RT
+      SubnetId: !Ref AppAZ1
+  AppAZ1Route:
+    Type: "AWS::EC2::Route"
+    Properties:  
+        DestinationCidrBlock: 0.0.0.0/0
+        NatGatewayId: nat-0e22a22d43e435b2c
+        RouteTableId: !Ref AppAZ1RT
+  AppAZ2RTAssoc:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref AppAZ2RT
+      SubnetId: !Ref AppAZ2
+  AppAZ2Route:
+    Type: 'AWS::EC2::Route'
+    Properties:  
+        DestinationCidrBlock: 0.0.0.0/0
+        NatGatewayId: nat-0c284b3f560910d41
+        RouteTableId: !Ref AppAZ2RT
+  VGWprop:
+    Type: 'AWS::EC2::VPNGatewayRoutePropagation'
+    Properties:
+        RouteTableIds: 
+        - !Ref AppAZ1RT
+        - !Ref AppAZ2RT
+        VpnGatewayId: vgw-11c14d21
+    DependsOn:
+      - AppAZ1
