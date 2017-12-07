@@ -26,7 +26,7 @@ Resources:
       VpcId: vpc-1799d67e
       Tags:
       - Key: Name
-        Value: ecs-prod-idmms-PvtAZ1-RT
+        Value: ecs-prod-idmms-PvtAZ1RT
       - Key: Application
         Value: ECS IDMMS PROD
       - Key: Environment
@@ -57,7 +57,7 @@ Resources:
       VpcId: vpc-1799d67e
       Tags:
       - Key: Name
-        Value: ecs-prod-idmms-PvtAZ2-RT
+        Value: ecs-prod-idmms-PvtAZ2RT
       - Key: Application
         Value: ECS IDMMS PROD
       - Key: Environment

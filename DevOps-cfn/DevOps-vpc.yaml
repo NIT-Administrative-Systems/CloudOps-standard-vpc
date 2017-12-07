@@ -216,12 +216,18 @@ Resources:
     Properties:
       AllocationId: !GetAtt [EIPNATAZ1, AllocationId]
       SubnetId: !Ref PubNetAZ1
+      Tags:
+        - Key: Name
+          Value: !Join ['-', [ !Ref 'AWS::StackName', NATAZ1] ]
 
   NATAZ2:
     Type: AWS::EC2::NatGateway
     Properties:
       AllocationId: !GetAtt [EIPNATAZ2, AllocationId]
       SubnetId: !Ref PubNetAZ2
+      Tags:
+        - Key: Name
+          Value: !Join ['-', [ !Ref 'AWS::StackName', NATAZ2] ]
 
   NATAZ1Route:
     Type: AWS::EC2::Route

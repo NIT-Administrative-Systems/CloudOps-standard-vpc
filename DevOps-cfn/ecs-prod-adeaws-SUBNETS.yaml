@@ -26,7 +26,7 @@ Resources:
       VpcId: vpc-db09ffb3
       Tags:
       - Key: Name
-        Value: ecs-prod-idmms-PvtAZ1-RT
+        Value: ecs-prod-idmms-PvtAZ1RT
       - Key: Application
         Value: ECS ADEA WS
       - Key: Environment
@@ -57,7 +57,7 @@ Resources:
       VpcId: vpc-db09ffb3
       Tags:
       - Key: Name
-        Value: ecs-prod-idmms-PvtAZ2-RT
+        Value: ecs-prod-idmms-PvtAZ2RT
       - Key: Application
         Value: ECS ADEA WS
       - Key: Environment
