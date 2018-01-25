@@ -1,0 +1,99 @@
+
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description:  Two Private DEV Subnets with default route to NGW, and Dynamic routing over VPN to campus.
+
+Resources:
+  AppAZ1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: vpc-5420772c
+      CidrBlock: 10.28.136.64/27
+      AvailabilityZone: "us-east-1a"
+      MapPublicIpOnLaunch: False
+      Tags:
+      - Key: Name
+        Value: lambda-dev-stage-rp-PvtAZ1
+      - Key: Application
+        Value: Researcher Portal 
+      - Key: Environment
+        Value: DEV
+      - Key: Owner
+        Value: awscloudops@northwestern.edu
+  AppAZ1RT:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: vpc-db09ffb3
+      Tags:
+      - Key: Name
+        Value: lambda-dev-stage-rp-PvtAZ1RT
+      - Key: Application
+        Value: Researcher Portal
+      - Key: Environment
+        Value: DEV
+      - Key: Owner
+        Value: awscloudops@northwestern.edu
+    DependsOn:
+      - AppAZ1
+  AppAZ2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: vpc-db09ffb3
+      CidrBlock: 10.28.136.96/27
+      AvailabilityZone: "us-east-1b"
+      MapPublicIpOnLaunch: False
+      Tags:
+      - Key: Name
+        Value: lambda-dev-stage-rp-PvtAZ2
+      - Key: Application
+        Value: Researcher Portal
+      - Key: Environment
+        Value: DEV
+      - Key: Owner
+        Value: awscloudops@northwestern.edu
+  AppAZ2RT:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: vpc-db09ffb3
+      Tags:
+      - Key: Name
+        Value: lambda-dev-stage-rp-PvtAZ2RT
+      - Key: Application
+        Value: Researcher Portal
+      - Key: Environment
+        Value: DEV
+      - Key: Owner
+        Value: awscloudops@northwestern.edu
+    DependsOn:
+      - AppAZ2
+  AppAZ1RTAssoc:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref AppAZ1RT
+      SubnetId: !Ref AppAZ1
+  AppAZ1Route:
+    Type: "AWS::EC2::Route"
+    Properties:  
+        DestinationCidrBlock: 0.0.0.0/0
+        NatGatewayId: nat-0d07fbf30257d0fe8
+        RouteTableId: !Ref AppAZ1RT
+  AppAZ2RTAssoc:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref AppAZ2RT
+      SubnetId: !Ref AppAZ2
+  AppAZ2Route:
+    Type: 'AWS::EC2::Route'
+    Properties:  
+        DestinationCidrBlock: 0.0.0.0/0
+        NatGatewayId: nat-0c9e36ccf9a6ab200
+        RouteTableId: !Ref AppAZ2RT
+  VGWprop:
+    Type: 'AWS::EC2::VPNGatewayRoutePropagation'
+    Properties:
+        RouteTableIds: 
+        - !Ref AppAZ1RT
+        - !Ref AppAZ2RT
+        VpnGatewayId: vgw-e5d3278c
+    DependsOn:
+      - AppAZ1

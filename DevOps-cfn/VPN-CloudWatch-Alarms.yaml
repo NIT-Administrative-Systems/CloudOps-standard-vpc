@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: VPN Alarms
+
+Parameters:
+ 
+
+Resources:
+  CloudWatchAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      ActionsEnabled: Boolean
+      AlarmActions:
+        - String
+      AlarmDescription: String
+      AlarmName: String
+      ComparisonOperator: String
+      Dimensions:
+        - Dimension
+      EvaluateLowSampleCountPercentile: String
+      EvaluationPeriods: Integer
+      ExtendedStatistic: String
+      InsufficientDataActions:
+        - String
+      MetricName: TunnelState
+      Namespace: String
+      OKActions:
+        - String
+      Period: Integer
+      Statistic: String
+      Threshold: Double
+      TreatMissingData: String
+      Unit: String
