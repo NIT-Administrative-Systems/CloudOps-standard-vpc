@@ -23,7 +23,7 @@ Resources:
   AppAZ1RT:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: vpc-db09ffb3
+      VpcId: vpc-5420772c
       Tags:
       - Key: Name
         Value: lambda-dev-stage-rp-PvtAZ1RT
@@ -38,7 +38,7 @@ Resources:
   AppAZ2:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: vpc-db09ffb3
+      VpcId: vpc-5420772c
       CidrBlock: 10.28.136.96/27
       AvailabilityZone: "us-east-1b"
       MapPublicIpOnLaunch: False
@@ -54,7 +54,7 @@ Resources:
   AppAZ2RT:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: vpc-db09ffb3
+      VpcId: vpc-5420772c
       Tags:
       - Key: Name
         Value: lambda-dev-stage-rp-PvtAZ2RT
