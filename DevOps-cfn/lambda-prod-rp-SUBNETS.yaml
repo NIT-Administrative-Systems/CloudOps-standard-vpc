@@ -1,7 +1,7 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description:  Two Private DEV Subnets with default route to NGW, and Dynamic routing over VPN to campus.
+Description:  Two Private PROD Subnets with default route to NGW, and Dynamic routing over VPN to campus.
 
 Resources:
   AppAZ1:
